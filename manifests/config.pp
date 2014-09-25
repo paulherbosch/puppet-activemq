@@ -11,13 +11,6 @@ class activemq::config {
     notify  => Class['activemq::service']
   }
 
-  file { '/etc/activemq/activemq-wrapper.conf':
-    ensure  => file,
-    mode    => '0644',
-    content => template("${module_name}/activemq-wrapper.conf.erb"),
-    notify  => Class['activemq::service']
-  }
-
   file { '/etc/activemq/jetty-realm.properties':
     ensure  => file,
     mode    => '0644',
