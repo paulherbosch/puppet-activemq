@@ -46,7 +46,7 @@ namespace "jenkins" do
         file.puts "module_name: #{module_name}"
         file.puts "git_commit: #{git_commit}"
 				file.puts "semver_version: #{semver_version}"
-        file.puts "rpm_name: #{rpm_name}"
+				file.puts "rpm_name: #{rpm_name}"
       }
     end
   end
