@@ -1,0 +1,36 @@
+require 'spec_helper_acceptance'
+
+describe 'activemq' do
+
+  describe 'running puppet code' do
+    it 'should work with no errors' do
+      pp = <<-EOS
+        include cegekarepos::cegeka
+        Yum::Repo <| title == 'cegeka-custom-noarch' |>
+
+        file { '/data':
+          ensure => directory
+        }
+        package { 'yum-plugin-versionlock':
+          ensure => installed
+        }
+
+        class { '::activemq':
+          version => '5.10.0-2.cgk.el6'
+        }
+      EOS
+
+      # Run it twice 
+      apply_manifest(pp, :catch_failures => true)
+      apply_manifest(pp, :catch_failures => true)
+      # and test for idempotency
+      apply_manifest(pp, :catch_changes => true)
+    end
+
+    describe file '/etc/activemq/activemq.xml' do
+      it { is_expected.to be_file }
+    end
+
+  end
+end
+
