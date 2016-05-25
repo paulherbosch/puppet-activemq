@@ -50,7 +50,12 @@ class activemq(
   $memoryUsage = '20 mb',
   $topic_memoryLimit = '1mb',
   $queue_memoryLimit = '1mb',
-  $optional_config = undef,
+  $advisorysupport = 'true',
+  $selectoraware = true,
+  $managementcontext_createconnector = 'false',
+  $transport_connector = {},
+  $users = {},
+  $optional_config = undef
 ) {
 
   include stdlib
@@ -64,11 +69,16 @@ class activemq(
   validate_re($persistence_adapter, '^kahadb$|^jdbc$')
   validate_re($persistence_db_type, '^derby$|^mysql$|^oracle$')
   validate_re($persistence_db_driver_version, '^6$|^7$')
+  validate_re($advisorysupport, '^false$|^true$')
+  validate_re($managementcontext_createconnector, '^false$|^true$')
   validate_bool($mqtt_enabled)
   validate_bool($mqtt_ssl_enabled)
   validate_bool($ssl_enabled)
   validate_bool($webconsole)
   validate_bool($scheduler_support_enabled)
+  validate_bool($selectoraware)
+  validate_hash($transport_connector)
+  validate_hash($users)
 
   $version_real = $version
   $versionlock_real = $versionlock
@@ -81,10 +91,11 @@ class activemq(
   $scheduler_support_enabled_real = $scheduler_support_enabled
   $ssl_enabled_real = $ssl_enabled
   $webconsole_real = $webconsole
-
-  class { 'activemq::preconfig':
-    optional_config => $optional_config
-  }
+  $advisorysupport_real = $advisorysupport
+  $selectoraware_real = $selectoraware
+  $managementcontext_createconnector_real = $managementcontext_createconnector
+  $transport_connector_real = $transport_connector
+  $users_real = $users
 
   class { 'activemq::package':
     package     => $package,
@@ -94,15 +105,21 @@ class activemq(
   }
 
   class { 'activemq::config':
-    version                       => $version_real,
-    persistence_db_driver_version => $persistence_db_driver_version_real
+    version                           => $version_real,
+    optional_config                   => $optional_config,
+    persistence_db_driver_version     => $persistence_db_driver_version_real,
+    advisorysupport                   => $advisorysupport_real,
+    selectoraware                     => $selectoraware_real,
+    managementcontext_createconnector => $managementcontext_createconnector_real,
+    transport_connector               => $transport_connector_real,
+    users                             => $users_real
   }
 
   class { 'activemq::service':
     ensure => $ensure_real
   }
 
-  Anchor['activemq::begin'] -> Class['Activemq::Preconfig'] -> Class['Activemq::Package']
+  Anchor['activemq::begin'] -> Class['Activemq::Package']
     -> Class['Activemq::Config'] ~> Class['Activemq::Service'] -> Anchor['activemq::end']
 
 }

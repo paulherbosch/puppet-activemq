@@ -1,5 +1,11 @@
 class activemq::config(
   $version = undef,
+  $optional_config = undef,
+  $advisorysupport = undef,
+  $selectoraware = undef,
+  $managementcontext_createconnector = undef,
+  $transport_connector = undef,
+  $users = undef,
   $persistence_db_driver_version = '6'
 ){
 
@@ -17,6 +23,31 @@ class activemq::config(
     owner   => 'activemq',
     group   => 'activemq',
     require => File['/data/activemq']
+  }
+
+  case $::osfamily {
+    'RedHat': {
+      if $::operatingsystemmajrelease < 7 {
+        file { '/etc/init.d/activemq':
+          ensure  => file,
+          mode    => '0755',
+          content => template("${module_name}/init/activemq"),
+        }
+      }
+    }
+  }
+
+  file { '/etc/activemq':
+    ensure => directory
+  }
+
+  file { '/etc/activemq/activemq.xml':
+    ensure  => file,
+    mode    => '0644',
+    content => template("${module_name}/${version_real}/activemq.xml.erb"),
+    replace => false,
+    notify  => Class['activemq::service'],
+    require => File['/etc/activemq']
   }
 
   file { '/etc/activemq/activemq-wrapper.conf':
