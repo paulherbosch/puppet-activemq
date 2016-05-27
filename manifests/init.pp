@@ -55,6 +55,8 @@ class activemq(
   $managementcontext_createconnector = 'false',
   $transport_connector = {},
   $users = {},
+  $destinations = {},
+  $sysconfig_options = {},
   $optional_config = undef
 ) {
 
@@ -79,6 +81,8 @@ class activemq(
   validate_bool($selectoraware)
   validate_hash($transport_connector)
   validate_hash($users)
+  validate_hash($destinations)
+  validate_hash($sysconfig_options)
 
   $version_real = $version
   $versionlock_real = $versionlock
@@ -96,6 +100,8 @@ class activemq(
   $managementcontext_createconnector_real = $managementcontext_createconnector
   $transport_connector_real = $transport_connector
   $users_real = $users
+  $destinations_real = $destinations
+  $sysconfig_options_real = $sysconfig_options
 
   class { 'activemq::package':
     package     => $package,
@@ -112,7 +118,9 @@ class activemq(
     selectoraware                     => $selectoraware_real,
     managementcontext_createconnector => $managementcontext_createconnector_real,
     transport_connector               => $transport_connector_real,
-    users                             => $users_real
+    users                             => $users_real,
+    destinations                      => $destinations_real,
+    sysconfig_options                 => $sysconfig_options_real,
   }
 
   class { 'activemq::service':
