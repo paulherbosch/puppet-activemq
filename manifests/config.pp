@@ -16,7 +16,6 @@ class activemq::config(
 ){
 
   $major_version_withoutrelease = regsubst($version, '^(\d+\.\d+)\.\d+-.*$','\1')
-  notice("major_version_withoutrelease=${major_version_withoutrelease}")
 
   file { $data_dir:
     ensure => directory,
@@ -31,9 +30,9 @@ class activemq::config(
   }
 
   file { "${data_dir}/heapdumps":
-    ensure  => directory,
-    owner   => 'activemq',
-    group   => 'activemq',
+    ensure => directory,
+    owner  => 'activemq',
+    group  => 'activemq',
   }
 
   case $::osfamily {
@@ -46,6 +45,7 @@ class activemq::config(
         }
       }
     }
+    default: { notice('Only Redhat is supported') }
   }
 
   file { '/etc/activemq':
